@@ -1,16 +1,27 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import { AppUser } from './models/Usermodel.js'
+import {createServer} from 'http'
+import {Server} from 'socket.io'
+import cors from "cors"
 
 const app = express()
 app.use(express.json())
+let rideRequests=[]
+const httpServer = createServer(app)
+
+const io = new Server(httpServer, {
+    cors:{
+        origin:"http://localhost:3001"
+    }    
+})
 
 const MONGO_URI = "mongodb+srv://prompttest123:antonprince95@cluster0.asiy8fr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 
 mongoose.connect(MONGO_URI).then(() => {
     console.log("DB connected")
-    app.listen(5000, () => {
-        console.log("Running at 5000")
+    httpServer.listen(3000, () => {
+        console.log("Server Running at 3000")
     })
 }).catch((error) => {
     console.log("ERROR: ", error)
@@ -41,4 +52,19 @@ app.post('/authenticate_user', async (req, res) => {
     {
         res.status(400).json(error)    
     }
+})
+
+io.on("connect",(socket)=>{
+    console.log("User connected")
+    // console.log(socket.id)
+
+    socket.on("rideRequest",(request)=>{
+        console.log(request)
+        rideRequests.push(request)
+        socket.emit("rideRequestDetails",rideRequests)
+    })
+
+    socket.on("disconnect",()=>{
+        console.log("User disconnected")
+    })
 })
