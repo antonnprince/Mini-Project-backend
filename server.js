@@ -54,17 +54,32 @@ app.post('/authenticate_user', async (req, res) => {
     }
 })
 
-io.on("connect",(socket)=>{
-    console.log("User connected")
-    // console.log(socket.id)
 
-    socket.on("rideRequest",(request)=>{
-        console.log(request)
-        rideRequests.push(request)
-        socket.emit("rideRequestDetails",rideRequests)
-    })
+// let rideRequests = []
 
-    socket.on("disconnect",()=>{
-        console.log("User disconnected")
-    })
-})
+io.on("connection", (socket) => {
+    console.log("User connected");
+
+    socket.on("rideRequest", (request) => {
+        console.log("Received ride request:", request);
+        rideRequests.push(request);
+        io.emit("rideRequestDetails", rideRequests);
+    });
+
+    socket.on("acceptRide", (requestk) => {
+        console.log("Accepting ride for requestId:", requestk.requestId);
+        const request = rideRequests.find((req) => req.id === requestk.requestId);
+        
+        if (request) {
+        //    io.emit("rideFound","Found")
+             console.log("Found request:", request);
+            //  Handle sending data or further operations here
+        } else {
+            console.log("Request not found");
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("User disconnected");
+    });
+});
