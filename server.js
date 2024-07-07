@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import { AppUser } from './models/Usermodel.js'
 import {createServer} from 'http'
 import {Server} from 'socket.io'
-import cors from "cors"
+import cors from "cors" 
 
 const app = express()
 app.use(express.json())
@@ -27,25 +27,17 @@ mongoose.connect(MONGO_URI).then(() => {
     console.log("ERROR: ", error)
 })
 
-app.post('/authenticate_user', async (req, res) => {
-    try {
+app.post('/login', async (req, res) => {
+    try 
+    {
         const user = await AppUser.findOne({phoneNumber:req.body.phoneno})
-
         if(user)
             {
-                console.log(user)
-                return res.status(200).send(user)
+                return res.status(200).json(user)
             }
         else
             {
-                const newUser={
-                    phoneNumber:req.body.phoneno,
-                    name:req.body.name,
-                    email:req.body.email,
-                    role:req.body.role
-                }
-                await AppUser.create(newUser)
-                return res.status(200).json("User registered")    
+                return res.status(404).json({message:"User not found"})
             }
     } 
     catch (error) 
@@ -54,8 +46,48 @@ app.post('/authenticate_user', async (req, res) => {
     }
 })
 
+app.post('/register',async (req,res)=>{
+    const newUser={
+        phoneNumber:req.body.phoneno,
+        name:req.body.name,
+        email:req.body.email,
+        role:req.body.role,
+        department:req.body.department,
+        DOB:req.body.DOB
+    }
 
-// let rideRequests = []
+    await AppUser.create(newUser)
+    return res.status(200).json("User registered")   
+})
+
+app.post('/add_trip', async (req, res) => {
+    const { phoneno, source, destination, duration, fare } = req.body;
+
+    const tripObject = {
+        source,
+        destination,
+        duration,
+        fare
+    };
+
+    try {
+        const user = await AppUser.findOneAndUpdate(
+            { phoneNumber: phoneno },
+            { $push: { trips: tripObject } },
+            { new: true, useFindAndModify: false }
+        );
+
+        if (user) {
+            return res.status(200).json({ message: "Updated successfully", user });
+        } else {
+            return res.status(404).json({ message: "User not found" });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 io.on("connection", (socket) => {
     console.log("User connected");
@@ -67,13 +99,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("acceptRide", ({driverId,requestId}) => {
-        // console.log("Accepting ride for requestId:", requestId);
         const request = rideRequests.find((req) => req.id === requestId);
         
         if (request) 
         {
             console.log("Driver ",driverId," accepting request ",requestId)
-            socket.to(requestId).emit("riderMessage","Hi this is rider")
+            socket.to(requestId).emit("riderMessage",`Hi this is rider ${driverId}`)
+            
             //  console.log("Found request:", request);
             //  io.to(driverId).emit("facilitateComm", {passenger: request.id})
             //  socket.join(request.id)
