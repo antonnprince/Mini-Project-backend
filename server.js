@@ -46,6 +46,7 @@ app.post('/login', async (req, res) => {
     }
 })
 
+
 app.post('/register',async (req,res)=>{
     const newUser={
         phoneNumber:req.body.phoneno,
@@ -53,7 +54,9 @@ app.post('/register',async (req,res)=>{
         email:req.body.email,
         role:req.body.role,
         department:req.body.department,
-        DOB:req.body.DOB
+        DOB:req.body.DOB,
+        cusatID:req.body.cusatID,
+        driverLicense:req.body.driverLicense
     }
 
     await AppUser.create(newUser)
@@ -93,7 +96,7 @@ io.on("connection", (socket) => {
     console.log("User connected");
 
     socket.on("rideRequest", (request) => {
-        console.log("Received ride request:", request);
+        // console.log("Received ride request:", request);
         rideRequests.push(request);
         io.emit("rideRequestDetails", rideRequests);
     });
@@ -103,29 +106,16 @@ io.on("connection", (socket) => {
         
         if (request) 
         {
-            // console.log("Driver ",driverId," accepting request ",requestId)
-            // const riderObj={}
-            let riderObj
             
             socket.on("getRiderDetails",(data)=>{
-                riderObj={
-                    driverId:data.driverId,
-                    message:data.message
-                    }
-                    socket.to(requestId).emit("riderMessage",riderObj)
-            })
-            
+                    socket.to(requestId).emit("riderMessage",data)
+            })            
         } 
         else 
         {
             console.log("Request not found");
         }
     });
-
-    // socket.on("facilitateComm",({passenger})=>{
-    //     socket.join(passenger)
-
-    // })
 
     socket.on("disconnect", () => {
         console.log("User disconnected");
