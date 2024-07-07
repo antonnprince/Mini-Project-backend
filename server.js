@@ -27,6 +27,8 @@ mongoose.connect(MONGO_URI).then(() => {
     console.log("ERROR: ", error)
 })
 
+let ph
+
 app.post('/login', async (req, res) => {
     try 
     {
@@ -37,6 +39,7 @@ app.post('/login', async (req, res) => {
             }
         else
             {
+                ph=req.body.phoneno
                 return res.status(404).json({message:"User not found"})
             }
     } 
@@ -49,7 +52,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/register',async (req,res)=>{
     const newUser={
-        phoneNumber:req.body.phoneno,
+        phoneNumber:ph,   
         name:req.body.name,
         email:req.body.email,
         role:req.body.role,
