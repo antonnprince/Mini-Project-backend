@@ -7,6 +7,7 @@ function Rider() {
     const [socket,setSocket] = useState(null)
     const [socketId, setSocketId] = useState('');
     const [pass,setPass] = useState("")
+    const [mess,setMess]=useState("")
 
     useEffect(()=>{
         const newSocket = io("http://localhost:3000",{
@@ -38,9 +39,16 @@ function Rider() {
     const acceptRide=()=>{
         if(socket)
             socket.emit("acceptRide", {requestId:pass,driverId:socketId})
-        // console.log(socketId)
+        //  console.log(socketId)
 
-        socket.emit("facilitateComm",{driverId:socketId, passenger:pass})
+         const data = {
+            driverId:socketId,
+            message:mess
+         }
+
+        // socket.emit("facilitateComm",{driverId:socketId, passenger:pass})
+        // console.log(data)
+        socket.emit("getRiderDetails",data)
     }
 
   return (
@@ -52,7 +60,9 @@ function Rider() {
             Accept Ride
         </button>
 
+        
         <input onChange={(e)=>setPass(e.target.value)}/>
+        <input onChange={(e)=>setMess(e.target.value)}/>
     </div>
   )
 }
