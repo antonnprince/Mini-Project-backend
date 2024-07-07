@@ -1,29 +1,24 @@
 import mongoose from 'mongoose'
 const TripSchema = mongoose.Schema({
-            role:{
-                type:String,
-                required:true
-            },
+        source:{
+            type:String,
+            required:true
+        },
 
-            source:{
-                type:String,
-                required:true
-            },
+        destination:{
+            type:String,
+            required:true
+        },
 
-            destination:{
-                type:String,
-                required:true
-            },
+        duration:{
+            type:Number,
+            required:true
+        },
 
-            duration:{
-                type:Number,
-                required:true
-            },
-
-            fare:{
-                type:Number,
-                required:true
-            },
+        fare:{
+            type:Number,
+            required:true
+        },
         },
 
         {
@@ -48,11 +43,28 @@ const AppUserSchema = mongoose.Schema({
         required:true
     },
 
+    department:{
+        type:String,
+        required:true
+    },
+
+    DOB:{
+        type:Date,
+        required:true
+    },
+
+    cusatID:{
+        type:String,
+        required:true,
+    },
+
+    driverLicense:{
+        type:String,
+    },
+
     trips:{
         type:[TripSchema],    
     }
-
-
 
 })
 
