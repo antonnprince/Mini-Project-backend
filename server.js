@@ -66,18 +66,28 @@ io.on("connection", (socket) => {
         io.emit("rideRequestDetails", rideRequests);
     });
 
-    socket.on("acceptRide", (requestk) => {
-        console.log("Accepting ride for requestId:", requestk.requestId);
-        const request = rideRequests.find((req) => req.id === requestk.requestId);
+    socket.on("acceptRide", ({driverId,requestId}) => {
+        // console.log("Accepting ride for requestId:", requestId);
+        const request = rideRequests.find((req) => req.id === requestId);
         
-        if (request) {
-        //    io.emit("rideFound","Found")
-             console.log("Found request:", request);
-            //  Handle sending data or further operations here
-        } else {
+        if (request) 
+        {
+            console.log("Driver ",driverId," accepting request ",requestId)
+            socket.to(requestId).emit("riderMessage","Hi this is rider")
+            //  console.log("Found request:", request);
+            //  io.to(driverId).emit("facilitateComm", {passenger: request.id})
+            //  socket.join(request.id)
+        } 
+        else 
+        {
             console.log("Request not found");
         }
     });
+
+    // socket.on("facilitateComm",({passenger})=>{
+    //     socket.join(passenger)
+
+    // })
 
     socket.on("disconnect", () => {
         console.log("User disconnected");
