@@ -34,6 +34,8 @@ const RideTest = () => {
             console.log("Disconnected from socket");
         });
 
+
+
         setSocket(newSocket);
 
         return () => {
