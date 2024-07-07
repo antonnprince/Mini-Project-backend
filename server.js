@@ -103,12 +103,18 @@ io.on("connection", (socket) => {
         
         if (request) 
         {
-            console.log("Driver ",driverId," accepting request ",requestId)
-            socket.to(requestId).emit("riderMessage",`Hi this is rider ${driverId}`)
+            // console.log("Driver ",driverId," accepting request ",requestId)
+            // const riderObj={}
+            let riderObj
             
-            //  console.log("Found request:", request);
-            //  io.to(driverId).emit("facilitateComm", {passenger: request.id})
-            //  socket.join(request.id)
+            socket.on("getRiderDetails",(data)=>{
+                riderObj={
+                    driverId:data.driverId,
+                    message:data.message
+                    }
+                    socket.to(requestId).emit("riderMessage",riderObj)
+            })
+            
         } 
         else 
         {
